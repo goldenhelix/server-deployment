@@ -1,0 +1,6 @@
+host: smtp.office365.com
+port: 587
+username: smtp@yourdomain.com
+password: smtp_password
+use_tls: false
+from: Server Info<info@yourdomain.com>

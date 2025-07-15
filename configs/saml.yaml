@@ -1,0 +1,52 @@
+# SAML Configuration for integration with Azure AD / Microsoft Entra
+
+# The URL of the Identity Provider's SAML endpoint.
+# This is where the SAML authentication requests should be sent.
+# Example for Azure AD: https://login.microsoftonline.com/{tenant-id}/saml2
+idp_saml_url: 'https://login.microsoftonline.com/{tenant-id}/saml2'
+
+# The Entity ID to identify this server / application to the Identity Provider (IdP).
+# You can use the default 'goldenhelix-server-saml' or provide a custom identifier
+# In Azure AD, the field is named "Identifier (Entity ID)".
+idp_entity_id: goldenhelix-server-saml
+
+# X.509 SAML Certificate of the Identity Provider. This certificate is used to
+# verify the SAML responses in PEM format. For Azure AD, click "Download" for
+# Certificate (Base64) under SAML Certificates of the "Set up Single Sign-On
+# with SAML" page and save to keys/idp_cert.pem.
+idp_cert_file: keys/idp_cert.pem
+
+# Auto create users on first login. If set to false, users must be invited first
+# to a workspace or created by an admin.
+auto_create_users: true
+
+# Message to display on login page
+login_message: Please sign in with your external account credentials. You'll be redirected to your organization's sign in page.
+
+# Attribute mapping from SAML response to user profile fields
+# These fields depend on the attribute statements sent by Azure AD in the SAML response
+
+# Email Address:
+# The attribute name from the SAML response that contains the user's email address.
+# Default for Azure AD: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress
+email_attribute: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
+
+# Full Name:
+# The attribute name from the SAML response that contains the user's full name.
+# Default for Azure AD: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name
+full_name_attribute: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'
+
+# Stable User Identifier:
+# The attribute name from the SAML response to use as a stable identifier for the user.
+# This could be the 'NameID' or another unique and immutable field from Azure AD.
+# Default for Azure AD: http://schemas.microsoft.com/identity/claims/objectidentifier
+stable_id_attribute: 'http://schemas.microsoft.com/identity/claims/objectidentifier'
+
+# Optional: The base URL of the Golden Helix Server to be used by callbacks
+# If this is not set, it's defined in the config.yaml file
+# This should only be needed if the server is behind a reverse proxy from the IdP
+# server_base_url: "https://your-institute.varseq.com"
+
+# You now need to configure your SAML provider with the following application URLs:
+# - Reply URL (Assertion Consumer Service) URL: https://your-institute.varseq.com/auth/api/saml/callback
+# - Logout URL: https://your-institute.varseq.com/auth/api/saml/return-to-app

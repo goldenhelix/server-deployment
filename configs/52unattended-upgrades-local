@@ -1,0 +1,18 @@
+# Enable automatic removal of unused dependencies
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+# Ensure automatic reboot is disabled
+Unattended-Upgrade::Automatic-Reboot "false";
+
+# Allow both security and non-security updates
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}";
+    "${distro_id}:${distro_codename}-security";
+    "${distro_id}:${distro_codename}-updates";
+};
+
+# Enable unattended-upgrades
+APT::Periodic::Update-Package-Lists "1";
+
+# Run unattended-upgrades weekly (every 7 days)
+APT::Periodic::Unattended-Upgrade "7";

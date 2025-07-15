@@ -1,0 +1,107 @@
+
+# These dynamic agents are created on-demand by a workflow or application
+# fitting the requirements of the agent profile
+#
+# You can create as many of these as you have need for in your workflow and
+# applications
+aws_nano:
+  provider: aws
+  enabled: true
+  description: AWS VM with 4GB 2C (t3a.medium)
+  capabilities:
+    - applications
+  resources:
+    cpu_cores: 2
+    ram_gb: 4
+  max_instances: 10
+  shutdown_after_idle_minutes: 60
+  max_idle_instances: 2
+  auto_select: true
+  cost_per_hour: 0.0376
+  instance_type: t3a.medium
+
+aws_small:
+  provider: aws
+  enabled: true
+  description: AWS VM with 8GB 4C (c5ad.xlarge) - 150G scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 4
+    ram_gb: 8
+  max_instances: 10
+  shutdown_after_idle_minutes: 60
+  scratch_storage: /mnt
+  max_idle_instances: 2
+  auto_select: true
+  cost_per_hour: 0.172
+  instance_type: c5ad.xlarge
+
+aws_medium:
+  provider: aws
+  enabled: true
+  description: AWS VM with 16GB 8C (c5ad.2xlarge) - 300G scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 8
+    ram_gb: 16
+  max_instances: 10
+  shutdown_after_idle_minutes: 60
+  scratch_storage: /mnt
+  max_idle_instances: 2
+  auto_select: true
+  cost_per_hour: 0.344
+  instance_type: c5ad.2xlarge
+
+aws_large:
+  provider: aws
+  enabled: true
+  description: AWS VM with 32GB 16C (c5ad.4xlarge) - 600G scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 16
+    ram_gb: 32
+  max_instances: 10
+  shutdown_after_idle_minutes: 10
+  scratch_storage: /mnt
+  auto_select: true
+  cost_per_hour: 0.688
+  instance_type: c5ad.4xlarge
+
+aws_xlarge:
+  provider: aws
+  enabled: true
+  description: AWS VM with 64GB 32C (c5ad.8xlarge) - 1.2T scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 32
+    ram_gb: 64
+  max_instances: 10
+  shutdown_after_idle_minutes: 10
+  scratch_storage: /mnt
+  auto_select: true
+  cost_per_hour: 1.376
+  instance_type: c5ad.8xlarge
+
+aws_2x_large:
+  provider: aws
+  enabled: true
+  description: AWS VM with 128GB 64C (c5ad.16xlarge) - 2.4T scratch storage
+  capabilities:
+    - workflows # This high-CPU instance is optimized for secondary analysis workflows
+  resources:
+    cpu_cores: 64
+    ram_gb: 128
+  max_instances: 10
+  shutdown_after_idle_minutes: 10
+  scratch_storage: /mnt
+  auto_select: true
+  cost_per_hour: 2.752
+  instance_type: c5ad.16xlarge

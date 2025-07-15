@@ -1,0 +1,107 @@
+
+# These dynamic agents are created on-demand by a workflow or application
+# fitting the requirements of the agent profile
+#
+# You can create as many of these as you have need for in your workflow and
+# applications
+azure_nano:
+  provider: azure
+  enabled: true
+  description: Azure VM with 4GB 2C (Standard_B2s)
+  capabilities:
+    - applications
+  resources:
+    cpu_cores: 2
+    ram_gb: 4
+  max_instances: 10
+  shutdown_after_idle_minutes: 60
+  max_idle_instances: 2
+  auto_select: true
+  cost_per_hour: 0.0416
+  instance_type: Standard_B2s
+
+azure_small:
+  provider: azure
+  enabled: true
+  description: Azure VM with 8GB 4C (Standard_F4s_v2) - 32G scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 4
+    ram_gb: 8
+  max_instances: 10
+  shutdown_after_idle_minutes: 60
+  max_idle_instances: 2
+  scratch_storage: /mnt
+  auto_select: true
+  cost_per_hour: 0.188
+  instance_type: Standard_F4s_v2
+
+azure_medium:
+  provider: azure
+  enabled: true
+  description: Azure VM with 16GB 8C (Standard_F8s_v2) - 64G scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 8
+    ram_gb: 16
+  max_instances: 10
+  shutdown_after_idle_minutes: 60
+  max_idle_instances: 2
+  scratch_storage: /mnt
+  auto_select: true
+  cost_per_hour: 0.376
+  instance_type: Standard_F8s_v2
+
+azure_large:
+  provider: azure
+  enabled: true
+  description: Azure VM with 32GB 16C (Standard_F16s_v2) - 128G scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 16
+    ram_gb: 32
+  max_instances: 10
+  shutdown_after_idle_minutes: 10
+  scratch_storage: /mnt
+  auto_select: true
+  cost_per_hour: 0.6770
+  instance_type: Standard_F16s_v2
+
+azure_xlarge:
+  provider: azure
+  enabled: true
+  description: Azure VM with 64GB 32C (Standard_F32s_v2) - 256G scratch storage
+  capabilities:
+    - workflows
+    - applications
+  resources:
+    cpu_cores: 32
+    ram_gb: 64
+  max_instances: 10
+  shutdown_after_idle_minutes: 10
+  scratch_storage: /mnt
+  auto_select: true
+  cost_per_hour: 1.504
+  instance_type: Standard_F32s_v2
+
+azure_2x_large:
+  provider: azure
+  enabled: true
+  description: Azure VM with 128GB 64C (Standard_F64s_v2) - 512G scratch storage
+  capabilities:
+    - workflows # This high-CPU instance is optimized for secondary analysis workflows
+  resources:
+    cpu_cores: 64
+    ram_gb: 128
+  max_instances: 10
+  shutdown_after_idle_minutes: 10
+  scratch_storage: /mnt
+  auto_select: false
+  cost_per_hour: 2.706
+  instance_type: Standard_F64s_v2
