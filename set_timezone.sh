@@ -22,4 +22,4 @@ public_ip=$(cd "$TF_DIR" && $TF output -raw public_ip)
 
 ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_key.pem \
     "$ADMIN_USER"@"$public_ip" "sudo timedatectl set-timezone  \"${time_zone}\" && \
-    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && echo \"TZ: ${time_zone}\" >> config.yaml && ./ghadmin server-reload-auth'"
+    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && if ! grep -q \"^TZ:\" config.yaml; then echo \"TZ: ${time_zone}\" >> config.yaml; fi && ./ghadmin server-reload-auth'"

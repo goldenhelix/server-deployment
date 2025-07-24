@@ -22,4 +22,4 @@ public_ip=$(cd "$TF_DIR" && $TF output -raw public_ip)
 
 ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_key.pem \
     "$ADMIN_USER"@"$public_ip" "sudo sh -c 'echo \"${locale}\" > /etc/locale.conf' && sudo localectl set-locale LANG=${locale} && sudo locale-gen ${locale} && \
-    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && echo \"LC_ALL: ${locale}\" >> config.yaml && ./ghadmin server-reload-auth'"
+    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && if ! grep -q \"^LC_ALL:\" config.yaml; then echo \"LC_ALL: ${locale}\" >> config.yaml; fi && ./ghadmin server-reload-auth'"
