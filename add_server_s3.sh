@@ -6,16 +6,15 @@ if [ -f env.sh ]; then
   source env.sh
 fi
 
-# Check if both email and password are provided
-if [ $# -lt 3 ]; then
-  echo "Error: A workspace, mount name, and bucket name must be provided."
-  echo "Usage: $0 <workspace> <mount_name> <bucket_name>"
+# Check if both mount name and bucket name are provided
+if [ $# -lt 2 ]; then
+  echo "Error: A mount name and bucket name must be provided."
+  echo "Usage: $0 <mount_name> <bucket_name>"
   exit 1
 fi
 
-workspace=$1
-mount_name=$2
-bucket_name=$3
+mount_name=$1
+bucket_name=$2
 
 # Determine Terraform directory based on provider
 TF_DIR="tf_${CLOUD_PROVIDER:-aws}"
@@ -53,6 +52,5 @@ echo "Updated \$agents_file with cloud_storage_mounts: { \"\$mount_name\": \"\$b
 SCRIPT
 chmod +x /tmp/modify_agents.sh
 sudo /opt/ghserver/install.sh -y add_mount_s3 "${mount_name}" "${bucket_name}" \
-&& sudo /tmp/modify_agents.sh "${mount_name}" "${bucket_name}" "/opt/ghserver/configs/agents.yaml" \
-&& sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && ./ghadmin workspace-add-share "${workspace}" "${mount_name}"'
+&& sudo /tmp/modify_agents.sh "${mount_name}" "${bucket_name}" "/opt/ghserver/configs/agents.yaml"
 EOF

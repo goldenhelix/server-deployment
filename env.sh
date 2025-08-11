@@ -10,19 +10,22 @@ LICENSE_KEY=S-000000-000000-000000-000000
 # Server name
 SERVER_NAME="Institution Server"
 
-# Workspace details
+# Primary workspace details
 WORKSPACE="workspace"
-WORKSPACE_NAME="Workspace"
+WORKSPACE_NAME="Workspace GRCh38"
+WORKSPACE_ASSEMBLY="hg38"
+
+# Optional second workspace details (commented out by default)
+# WORKSPACE2="workspace37"
+# WORKSPACE2_NAME="Workspace GRCh37"
+# WORKSPACE2_ASSEMBLY="hg19"
 
 # Timezone and locale settings
 TIMEZONE="America/New_York"
 LOCALE="en_US.UTF-8"
 
-# Assembly version
-ASSEMBLY="hg38"
-
 # Change to true to enable SAML (based on configs/saml.yaml)
-SETUP_SAML=true
+SETUP_SAML=false
 
 # Optional Sentieon license file 
 # SENTIEON_LICENSE_FILE="configs/Institution.varseq.lic"

@@ -136,6 +136,8 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
     -keyout certs/key.pem \
     -out certs/cert.pem
 EOF
+
+export cert_type="custom"
 export cert_file="/opt/ghserver/certs/cert.pem"
 export cert_key="/opt/ghserver/certs/key.pem"
 

@@ -27,8 +27,8 @@ ssh_access_cidrs = ["0.0.0.0/0"]
 
 ## Master Instance Settings
 # Choose one of the following instance types:
-# master_instance_type = "m6a.xlarge" # 4 cores, 16GB of RAM
-master_instance_type = "m6a.2xlarge" # 8 cores, 32GB of RAM
+# master_instance_type = "m6i.xlarge" # 4 cores, 16GB of RAM
+master_instance_type = "m6i.2xlarge" # 8 cores, 32GB of RAM
 master_hdd_size_gb   = 100
 workflow_hdd_size_gb = 600
 

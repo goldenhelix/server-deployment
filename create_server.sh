@@ -189,22 +189,47 @@ fi
 # Activate the license, requires that email is registered with Golden Helix
 ./activate_license.sh "${LICENSE_KEY}" "${email}"
 
-# Create a workspace (assembly can be hg19 or hg38)
-./create_workspace.sh "${WORKSPACE}" "${WORKSPACE_NAME}" "${ASSEMBLY}"
+# Create the primary workspace (assembly can be hg19 or hg38)
+./create_workspace.sh "${WORKSPACE}" "${WORKSPACE_NAME}" "${WORKSPACE_ASSEMBLY}"
 
-# add user to workspace
+# Create the second workspace if variables are defined
+if [ -n "${WORKSPACE2:-}" ] && [ -n "${WORKSPACE2_NAME:-}" ] && [ -n "${WORKSPACE2_ASSEMBLY:-}" ]; then
+    echo "Creating second workspace: ${WORKSPACE2_NAME} (${WORKSPACE2_ASSEMBLY})"
+    ./create_workspace.sh "${WORKSPACE2}" "${WORKSPACE2_NAME}" "${WORKSPACE2_ASSEMBLY}"
+fi
+
+# add user to primary workspace
 ./invite_user.sh "${WORKSPACE}" "${email}" "admin"
+
+# add user to second workspace if it exists
+if [ -n "${WORKSPACE2:-}" ]; then
+    ./invite_user.sh "${WORKSPACE2}" "${email}" "admin"
+fi
 
 # Add the created S3 bucket for workspace storage
 if [ "$CLOUD_PROVIDER" = "aws" ]; then
     # TODO: We should have this be called ./add_server_agent_bucket or ./add_server_agent_storage
     # Most of it is cloud agnostic, we just need the tmp/install.sh -y add_mount_(*) part
     s3_bucket=$(cd "$TF_DIR" && $TF output -raw bucket_name)
-    ./add_server_s3.sh "${WORKSPACE}" CloudStorage "${s3_bucket}"
+    ./add_server_s3.sh CloudStorage "${s3_bucket}"
+    ./add_workspace_share.sh "${WORKSPACE}" CloudStorage
+    ./add_workspace_resource_path.sh "${WORKSPACE}" "CloudStorage/resources"
+    # Add storage to second workspace if it exists
+    if [ -n "${WORKSPACE2:-}" ]; then
+        ./add_workspace_share.sh "${WORKSPACE2}" CloudStorage
+        ./add_workspace_resource_path.sh "${WORKSPACE2}" "CloudStorage/resources"
+    fi
 elif [ "$CLOUD_PROVIDER" = "azure" ]; then
     storage_account_name=$(cd "$TF_DIR" && $TF output -raw storage_account_name)
     storage_container_name=$(cd "$TF_DIR" && $TF output -raw storage_container_name)
-    ./add_server_azure.sh "${WORKSPACE}" "CloudStorage" "${storage_account_name}" "${storage_container_name}"
+    ./add_server_azure.sh "CloudStorage" "${storage_account_name}" "${storage_container_name}"
+    ./add_workspace_share.sh "${WORKSPACE}" CloudStorage
+    ./add_workspace_resource_path.sh "${WORKSPACE}" "CloudStorage/resources"
+    # Add storage to second workspace if it exists
+    if [ -n "${WORKSPACE2:-}" ]; then
+        ./add_workspace_share.sh "${WORKSPACE2}" CloudStorage
+        ./add_workspace_resource_path.sh "${WORKSPACE2}" "CloudStorage/resources"
+    fi
 fi
 
 # Set up Sentieon license
@@ -214,17 +239,32 @@ fi
 
 # Set up DNAnexus fuse mount
 if [ -n "${DX_MOUNT_NAME}" ] && [ -n "${DX_API_TOKEN}" ] && [ -n "${DX_PROJECT_NAME}" ]; then
-    ./add_dxfuse.sh "${WORKSPACE}" "${DX_MOUNT_NAME}" "${DX_API_TOKEN}" "${DX_PROJECT_NAME}"
+    ./add_dxfuse.sh "${DX_MOUNT_NAME}" "${DX_API_TOKEN}" "${DX_PROJECT_NAME}"
+    ./add_workspace_share.sh "${WORKSPACE}" "${DX_MOUNT_NAME}"
+    # Add mount to second workspace if it exists
+    if [ -n "${WORKSPACE2:-}" ]; then
+        ./add_workspace_share.sh "${WORKSPACE2}" "${DX_MOUNT_NAME}"
+    fi
 fi
 
 # Set up BaseSpace mount
 if [ -n "${BASESPACE_MOUNT_NAME}" ] && [ -n "${BASESPACE_API_TOKEN}" ]; then
-    ./add_basespace.sh "${WORKSPACE}" "${BASESPACE_MOUNT_NAME}" "${BASESPACE_API_TOKEN}"
+    ./add_basespace.sh "${BASESPACE_MOUNT_NAME}" "${BASESPACE_API_TOKEN}"
+    ./add_workspace_share.sh "${WORKSPACE}" "${BASESPACE_MOUNT_NAME}"
+    # Add mount to second workspace if it exists
+    if [ -n "${WORKSPACE2:-}" ]; then
+        ./add_workspace_share.sh "${WORKSPACE2}" "${BASESPACE_MOUNT_NAME}"
+    fi
 fi
 
 # Set up Azure Blob Storage mount
 if [ -n "${AZURE_MOUNT_NAME}" ] && [ -n "${AZURE_ACCOUNT_NAME}" ] && [ -n "${AZURE_ACCOUNT_KEY}" ] && [ -n "${AZURE_ACCOUNT_CONTAINER}" ]; then
-    ./add_azure_blob.sh "${WORKSPACE}" "${AZURE_MOUNT_NAME}" "${AZURE_ACCOUNT_NAME}" "${AZURE_ACCOUNT_KEY}" "${AZURE_ACCOUNT_CONTAINER}"
+    ./add_azure_blob.sh "${AZURE_MOUNT_NAME}" "${AZURE_ACCOUNT_NAME}" "${AZURE_ACCOUNT_KEY}" "${AZURE_ACCOUNT_CONTAINER}"
+    ./add_workspace_share.sh "${WORKSPACE}" "${AZURE_MOUNT_NAME}"
+    # Add mount to second workspace if it exists
+    if [ -n "${WORKSPACE2:-}" ]; then
+        ./add_workspace_share.sh "${WORKSPACE2}" "${AZURE_MOUNT_NAME}"
+    fi
 fi
 
 # Start the process of rebuilding the agent images (this will take a while and should not be interrupted by server restarts)

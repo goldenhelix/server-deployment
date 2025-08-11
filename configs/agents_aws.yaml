@@ -7,7 +7,7 @@
 aws_nano:
   provider: aws
   enabled: true
-  description: AWS VM with 4GB 2C (t3a.medium)
+  description: AWS VM with 4GB 2C (t3.medium)
   capabilities:
     - applications
   resources:
@@ -18,7 +18,7 @@ aws_nano:
   max_idle_instances: 2
   auto_select: true
   cost_per_hour: 0.0376
-  instance_type: t3a.medium
+  instance_type: t3.medium
 
 aws_small:
   provider: aws
