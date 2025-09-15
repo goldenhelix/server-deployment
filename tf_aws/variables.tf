@@ -77,11 +77,6 @@ variable "swap_size" {
   description = "The amount of swap (in GB) to configure inside the compute instances"
   type        = number
   default     = 4
-
-  validation {
-    condition     = var.swap_size >= 1 && var.swap_size <= 8 && floor(var.swap_size) == var.swap_size
-    error_message = "Swap size is the amount of disk space to use for each server in GB and must be an integer between 1 and 8."
-  }
 }
 
 variable "master_instance_type" {

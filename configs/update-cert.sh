@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Example use
-# ./update-cert.sh --license-key "S-cdec00-b49907-e3850f-731f61" --subdomain "test" --ip "192.168.254.1" -c test-cert.pem -p test-key.pem
+# ./update-cert.sh --license-key "S-cdec00-b49907-e3850f-731f61" --subdomain "test" --ip "192.168.254.1" -c test-cert.crt -p test-cert.key
 
 # Example crontab entry that runs 1st of every month at 3:00 AM
-# 0 3 1 * * /opt/ghserver/update-cert.sh -k "S-131699-a20efd-68e066-33506e" -s "fccc-test" > /opt/ghserver/update-cert.log 2>&1
+# 0 3 1 * * /opt/ghserver/update-cert.sh -k "S-131699-a20efd-68e066-33506e" -s "test" > /opt/ghserver/update-cert.log 2>&1
 
 # Default values
-CERT_PATH="/opt/ghserver/certs/cert.pem"
-KEY_PATH="/opt/ghserver/certs/key.pem"
+CERT_PATH="/opt/ghserver/certs/cert.crt"
+KEY_PATH="/opt/ghserver/certs/cert.key"
 LICENSE_KEY=""
 PUBLIC_IP=""
 SUBDOMAIN=""
@@ -117,11 +117,15 @@ fi
 chmod 644 "$CERT_PATH"
 chmod 600 "$KEY_PATH"
 
-# Reload Caddy if files were updated successfully
+# Reload the services if files were updated successfully
 if [ $? -eq 0 ]; then
     cd /opt/ghserver
-    docker compose restart web
-    echo "restart admin-console" > configs/services/service-command
+    echo "Restarting caddy configuration..."
+    date
+    # Force reload of the certificate files (otherwise caddy does nothing as it sees no change in file names)
+    docker exec web /opt/frontend/caddy reload --force --config /opt/frontend/caddy.json
+    # Ensure the latest JSON is used for the caddy configuration
+    /opt/ghserver/ghadmin server-reload-caddy
 fi
 
 echo "Certificate and key files have been updated:"

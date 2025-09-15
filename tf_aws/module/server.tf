@@ -1,5 +1,5 @@
 resource "aws_instance" "server" {
-  ami                         = var.ec2_ami != "" ? var.ec2_ami : data.aws_ssm_parameter.debian_12_ami.value
+  ami                         = var.ec2_ami != "" ? var.ec2_ami : data.aws_ssm_parameter.debian_13_ami.value
   instance_type               = var.master_instance_type
   vpc_security_group_ids      = [aws_security_group.server.id]
   subnet_id                   = aws_subnet.public.id

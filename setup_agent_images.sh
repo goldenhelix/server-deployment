@@ -24,5 +24,5 @@ ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_ke
 ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_key.pem \
     "$ADMIN_USER"@"$public_ip" "while read -r image; do \
     echo \"Pulling \$image...\" && \
-    sudo -u ghuser docker pull \"\$image\"; \
+    sudo -u ghuser -i /bin/bash -c \"docker pull \\\"\$image\\\"\"; \
     done < $remote_path"

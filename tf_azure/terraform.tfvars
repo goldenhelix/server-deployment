@@ -31,14 +31,14 @@ ssh_access_cidrs = ["0.0.0.0/0"]
 # Choose one of the following VM sizes:
 # Standard_D4s_v5 (4 cores, 16GB RAM) or Standard_D8s_v5 (8 cores, 32GB RAM)
 master_vm_size     = "Standard_D8s_v5"  # 8 cores, 32GB RAM
-master_os_disk_size_gb    = 100
+master_os_disk_size_gb    = 150
 workflow_data_disk_size_gb = 600
 
 ## General Server settings
 # vm_image = {} # Leave empty to use the latest Debian 12 image
 
 # Swap size in GB
-swap_size  = 4
+swap_size  = 16
 
 ## Default tags for all Azure resources
 azure_tags = {

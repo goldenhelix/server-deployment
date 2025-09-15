@@ -69,7 +69,8 @@ the `./create_server.sh` script.
 
 You may allow the deployment to generate an SSH key pair for you, or you may
 provide the public key of a pre-generated key pair in the `ssh_authorized_keys`
-variable. Save the private key as ssh_key.pem (chmod 400) in this directory.
+variable. Save the private key as ssh_key.pem (chmod 400) in the tf_aws or
+tf_azure directory.
 
 ### Cloud Provider Credentials
 

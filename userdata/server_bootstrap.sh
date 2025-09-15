@@ -24,6 +24,9 @@ chmod 600 /var/custom.swap
 mkswap /var/custom.swap
 swapon /var/custom.swap
 echo '/var/custom.swap swap swap defaults 0 0' | tee -a /etc/fstab
+# Configure low swappiness for cloud EBS storage
+echo 'vm.swappiness=10' >> /etc/sysctl.conf
+sysctl -p
 
 cd /tmp
 
@@ -48,8 +51,8 @@ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 DEBIAN_FRONTEND=noninteractive apt-get install -y unattended-upgrades curl xfsprogs
 
 # Download and run the installer for Golden Helix Server
-curl -o install.sh https://www.goldenhelix.com/Downloads/install.sh
-# curl -o install.sh https://www.goldenhelix.com/Downloads/install-insiders.sh
+# curl -o install.sh https://www.goldenhelix.com/Downloads/install.sh
+curl -o install.sh https://www.goldenhelix.com/Downloads/install-insiders.sh
 chmod +x install.sh
 
 # Set the hostname to the Private IP in /etc/hosts
@@ -63,25 +66,48 @@ hostnamectl set-hostname "${domain_name}"
 ./install.sh -y install_dependencies 
 # Create unprivileged ghuser, which is used to run rootless docker
 ./install.sh -y create_user 
-# Install rootless docker under ghuser
-./install.sh -y install_docker
+# Install rootless podman under ghuser
+./install.sh -y install_podman
 
 # NAT SETUP
 # The server acts as a NAT gateway to allow dynamic agents to have outbound internet access
 
-# Install iptables-persistent non-interactively for NAT functionality
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent
-
-# Add NAT configuration AFTER Docker install (to avoid Docker iptables rules overwriting)
+# Add NAT configuration AFTER Docker install (to avoid Docker rules overwriting)
 IFACE=$(ip route | grep default | awk '{print $5}')
 echo "Using interface: $IFACE for NAT configuration..."
-iptables -t nat -A POSTROUTING -o $IFACE -s ${private_subnet_cidr} -j MASQUERADE
-iptables -P FORWARD ACCEPT
-iptables -I FORWARD 1 -i $IFACE -s ${private_subnet_cidr} -j ACCEPT
-iptables -I FORWARD 2 -o $IFACE -d ${private_subnet_cidr} -j ACCEPT
-netfilter-persistent save
+
+# Create nftables ruleset for NAT
+cat > /etc/nftables.conf << EOF
+#!/usr/sbin/nft -f
+
+# Flush existing rules
+flush ruleset
+
+# Define tables
+table inet filter {
+    chain forward {
+        type filter hook forward priority 0; policy accept;
+        iifname "$IFACE" ip saddr ${private_subnet_cidr} accept
+        oifname "$IFACE" ip daddr ${private_subnet_cidr} accept
+    }
+}
+
+table inet nat {
+    chain postrouting {
+        type nat hook postrouting priority 100; policy accept;
+        oifname "$IFACE" ip saddr ${private_subnet_cidr} masquerade
+    }
+}
+EOF
+
+# Apply the nftables rules
+nft -f /etc/nftables.conf
+
+# Enable nftables service for persistence
+systemctl enable nftables
+systemctl start nftables
+
+# Enable IP forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward
 echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
 sysctl -p # Apply sysctl changes
@@ -107,12 +133,18 @@ if [ ! -b "$DEVICE" ]; then
 fi
 
 ## Add second volume for workflows
-mkfs.xfs "$DEVICE"
+mkfs.xfs -f -L opt "$DEVICE"
 mkdir -p /opt
 mount "$DEVICE" /opt
-echo "$DEVICE /opt xfs defaults 0 2" >> /etc/fstab
+UUID="$(blkid -s UUID -o value "$DEVICE")"
+[[ -n "$UUID" ]] || { echo "Failed to get UUID for $DEVICE"; exit 1; }
+printf 'UUID=%s /opt xfs nofail,x-systemd.device-timeout=30s,x-systemd.automount 0 0\n' "$UUID" >> /etc/fstab
 
-# SERVER SETUP
+systemctl daemon-reload
+mountpoint -q /opt || mount /opt
+
+# Enable periodic TRIM (better than mount 'discard' for Azure SSD)
+systemctl enable --now fstrim.timer
 
 # Log into the Golden Helix Docker registry
 sudo -u ghuser -g ghuser -i /bin/bash -c 'docker login --username "${registry_user}" --password "${registry_pass}" registry.goldenhelix.com'
@@ -126,20 +158,8 @@ export server_ip="$PRIVATE_IP"
 # export cert_file=auto
 # export cert_key=auto
 
-# Generate self-signed certificates as ghuser under /opt/ghserver/certs
-mkdir -p /opt/ghserver/certs
-chown ghuser:ghuser -R /opt/ghserver
-sudo -u ghuser -g ghuser -i /bin/bash <<EOF
-cd /opt/ghserver
-openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
-    -subj "/C=US/ST=State/L=City/O=Organization/OU=Department/CN=${domain_name}" \
-    -keyout certs/key.pem \
-    -out certs/cert.pem
-EOF
-
-export cert_type="custom"
-export cert_file="/opt/ghserver/certs/cert.pem"
-export cert_key="/opt/ghserver/certs/key.pem"
+# Generate self-signed certificates by default (post-install scripts set up *.varseq.com certs)
+export cert_type="self-signed"
 
 # Pulls the docker images, initializes the configs under /opt/ghserver, and starts the server
 echo "Running installer"
@@ -178,8 +198,8 @@ cd /opt/ghserver                           # Go to installation directory
 docker compose ps                          # Review dokcer-compose services
 docker compose logs -n 100 auth            # Review auth logs
 systemctl --user list-units --type=service # List user services (including mounts)
-systemctl --user restart ghserver.service  # Restart the server
-journalctl --user -u ghserver.service      # Check server logs
+./restart.sh                               # Restart the server
+./status.sh                                # Check the server status
 
 Note: This is a production server. Please ensure all actions are authorized.
 

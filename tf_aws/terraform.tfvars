@@ -29,14 +29,14 @@ ssh_access_cidrs = ["0.0.0.0/0"]
 # Choose one of the following instance types:
 # master_instance_type = "m6i.xlarge" # 4 cores, 16GB of RAM
 master_instance_type = "m6i.2xlarge" # 8 cores, 32GB of RAM
-master_hdd_size_gb   = 100
+master_hdd_size_gb   = 150
 workflow_hdd_size_gb = 600
 
 ## General Server settings
-# ec2_ami_id = "" # Leave empty to use the latest Debian 12 AMI
+# ec2_ami_id = "" # Leave empty to use the latest Debian 13 AMI
 
 # Swap size in GB
-swap_size  = 4
+swap_size  = 16
 
 ## Default tags for all AWS resources, also in dynamic agents
 aws_default_tags = {

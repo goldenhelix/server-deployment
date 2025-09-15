@@ -21,4 +21,4 @@ ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_ke
     "$ADMIN_USER"@"$public_ip" "sudo mv /tmp/smtp.yaml $remote_path && \
     sudo chown ghuser:ghuser $remote_path && \
     sudo sed -i '/^smtp_enabled:/ s/false/true/' /opt/ghserver/config.yaml && \
-    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && ./ghadmin server-reload-auth'"
+    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && ./ghadmin server-reload-auth && sleep 2s'"

@@ -57,8 +57,8 @@ variable "vm_image" {
   })
   default = {
     publisher = "Debian"
-    offer     = "debian-12"
-    sku       = "12"
+    offer     = "debian-13"
+    sku       = "13"
     version   = "latest"
   }
 }

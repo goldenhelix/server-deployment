@@ -36,7 +36,7 @@ variable "location" {
 }
 
 variable "availability_zone" {
-  description = "The Availability Zone to deploy resources into (e.g., '1', '2', '3'). Required if use_premium_v2 is true."
+  description = "The Availability Zone to deploy resources into (e.g., '1', '2', '3'). Set to null for regions that don't support availability zones (e.g., westus)."
   type        = string
   default     = null
 }
@@ -104,7 +104,7 @@ variable "workflow_data_disk_size_gb" {
 }
 
 variable "vm_image" {
-  description = "Custom VM image details. Leave empty to use latest Debian 12"
+  description = "Custom VM image details. Leave empty to use latest Debian 13"
   type = object({
     publisher = string
     offer     = string
@@ -112,9 +112,9 @@ variable "vm_image" {
     version   = string
   })
   default = {
-    publisher = "Debian"
-    offer     = "debian-12"
-    sku       = "12"
+    publisher = "Debian"  
+    offer     = "debian-13"
+    sku       = "13"
     version   = "latest"
   }
 }

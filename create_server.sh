@@ -174,7 +174,7 @@ if [ "$SETUP_SAML" = true ]; then
     # Transfer SAML settings
     ./transfer_saml_settings.sh "${email}"
 else
-  echo "Setting up admin user..."
+    echo "Setting up admin user..."
     # Generate a printable password and add the admin user
     password=$(openssl rand -base64 18)
     ./add_admin.sh "${email}" "${password}"
