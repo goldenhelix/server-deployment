@@ -35,7 +35,7 @@ azure_small:
   max_idle_instances: 2
   scratch_storage: /mnt
   auto_select: true
-  cost_per_hour: 0.188
+  cost_per_hour: 0.1690
   instance_type: Standard_F4s_v2
 
 azure_medium:
@@ -53,7 +53,7 @@ azure_medium:
   max_idle_instances: 2
   scratch_storage: /mnt
   auto_select: true
-  cost_per_hour: 0.376
+  cost_per_hour: 0.3380
   instance_type: Standard_F8s_v2
 
 azure_large:
@@ -87,7 +87,7 @@ azure_xlarge:
   shutdown_after_idle_minutes: 10
   scratch_storage: /mnt
   auto_select: true
-  cost_per_hour: 1.504
+  cost_per_hour: 1.353
   instance_type: Standard_F32s_v2
 
 azure_2x_large:
