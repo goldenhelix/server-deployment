@@ -67,9 +67,11 @@ aws_large:
     cpu_cores: 16
     ram_gb: 32
   max_instances: 10
-  shutdown_after_idle_minutes: 10
+  shutdown_after_idle_minutes: 60
   scratch_storage: /mnt
+  max_idle_instances: 1
   auto_select: true
+  min_capacity_share: 0.8
   cost_per_hour: 0.688
   instance_type: c5ad.4xlarge
 
@@ -84,13 +86,31 @@ aws_xlarge:
     cpu_cores: 32
     ram_gb: 64
   max_instances: 10
-  shutdown_after_idle_minutes: 10
   scratch_storage: /mnt
+  shutdown_after_idle_minutes: 5
   auto_select: true
+  min_capacity_share: 0.8
   cost_per_hour: 1.376
   instance_type: c5ad.8xlarge
 
-aws_2x_large:
+aws_2xlarge:
+  provider: aws
+  enabled: true
+  description: AWS VM with 96GB 48C (c5ad.12xlarge) - 1.8T scratch storage
+  capabilities:
+    - workflows # This high-CPU instance is optimized for secondary analysis workflows
+  resources:
+    cpu_cores: 48
+    ram_gb: 96
+  max_instances: 5
+  scratch_storage: /mnt
+  shutdown_after_idle_minutes: 5
+  auto_select: true
+  min_capacity_share: 0.8
+  cost_per_hour: 2.064
+  instance_type: c5ad.12xlarge
+
+aws_4xlarge:
   provider: aws
   enabled: true
   description: AWS VM with 128GB 64C (c5ad.16xlarge) - 2.4T scratch storage
@@ -99,9 +119,10 @@ aws_2x_large:
   resources:
     cpu_cores: 64
     ram_gb: 128
-  max_instances: 10
-  shutdown_after_idle_minutes: 10
+  max_instances: 5
   scratch_storage: /mnt
+  shutdown_after_idle_minutes: 5
   auto_select: true
+  min_capacity_share: 0.8
   cost_per_hour: 2.752
   instance_type: c5ad.16xlarge

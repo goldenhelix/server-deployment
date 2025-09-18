@@ -74,7 +74,8 @@ while true; do
     if [ $exit_code -eq 0 ]; then
         echo "Cloud-init completed successfully"
         break
-    elif [ $exit_code -eq 1 ]; then
+    elif [ $exit_code -eq 1 ] || [ $exit_code -eq 2 ]; then
+        # Handle cloud-init exit codes 1 (failure) and 2 (degraded state)
         # Due to a issue in the debian cloud-init image, we get a resize2fs error that can be ignored
         # First check if we can connect and the file exists
         file_exists=$(ssh -q -o ConnectTimeout=5 -o "StrictHostKeyChecking=no" \

@@ -46,7 +46,6 @@ resource "azurerm_network_security_rule" "private_nsg_ingress" {
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.this.name
   network_security_group_name = azurerm_network_security_group.private_nsg.name
-  source_application_security_group_ids = []
   description                 = "Allow ${each.key} from server"
 }
 

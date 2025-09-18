@@ -25,8 +25,9 @@ mkswap /var/custom.swap
 swapon /var/custom.swap
 echo '/var/custom.swap swap swap defaults 0 0' | tee -a /etc/fstab
 # Configure low swappiness for cloud EBS storage
-echo 'vm.swappiness=10' >> /etc/sysctl.conf
-sysctl -p
+printf "vm.swappiness = 10\n" > /etc/sysctl.d/99-gh-agent.conf
+sysctl --system
+cat /proc/sys/vm/swappiness
 
 cd /tmp
 

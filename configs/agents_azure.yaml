@@ -67,9 +67,11 @@ azure_large:
     cpu_cores: 16
     ram_gb: 32
   max_instances: 10
-  shutdown_after_idle_minutes: 10
+  shutdown_after_idle_minutes: 60
   scratch_storage: /mnt
+  max_idle_instances: 1
   auto_select: true
+  min_capacity_share: 0.8
   cost_per_hour: 0.6770
   instance_type: Standard_F16s_v2
 
@@ -84,13 +86,31 @@ azure_xlarge:
     cpu_cores: 32
     ram_gb: 64
   max_instances: 10
-  shutdown_after_idle_minutes: 10
   scratch_storage: /mnt
+  shutdown_after_idle_minutes: 5
   auto_select: true
+  min_capacity_share: 0.8
   cost_per_hour: 1.353
   instance_type: Standard_F32s_v2
 
-azure_2x_large:
+azure_2xlarge:
+  provider: azure
+  enabled: true
+  description: Azure VM with 96GB 48C (Standard_F48s_v2) - 384G scratch storage
+  capabilities:
+    - workflows # This high-CPU instance is optimized for secondary analysis workflows
+  resources:
+    cpu_cores: 48
+    ram_gb: 96
+  max_instances: 5
+  scratch_storage: /mnt
+  shutdown_after_idle_minutes: 5
+  auto_select: true
+  min_capacity_share: 0.8
+  cost_per_hour: 2.030
+  instance_type: Standard_F48s_v2
+
+azure_4xlarge:
   provider: azure
   enabled: true
   description: Azure VM with 128GB 64C (Standard_F64s_v2) - 512G scratch storage
@@ -99,9 +119,10 @@ azure_2x_large:
   resources:
     cpu_cores: 64
     ram_gb: 128
-  max_instances: 10
-  shutdown_after_idle_minutes: 10
+  max_instances: 5
   scratch_storage: /mnt
-  auto_select: false
+  shutdown_after_idle_minutes: 5
+  auto_select: true
+  min_capacity_share: 0.8
   cost_per_hour: 2.706
   instance_type: Standard_F64s_v2
