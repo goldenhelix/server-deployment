@@ -108,10 +108,17 @@ nft -f /etc/nftables.conf
 systemctl enable nftables
 systemctl start nftables
 
-# Enable IP forwarding
-echo 1 > /proc/sys/net/ipv4/ip_forward
-echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-sysctl -p # Apply sysctl changes
+cat >/etc/sysctl.d/99-nat-router.conf <<'EOF'
+# Enable IPv4 forwarding for NAT gateway
+net.ipv4.ip_forward = 1
+
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.default.rp_filter = 2
+EOF
+
+# Apply now and ensure the loader is healthy
+sysctl --system
+systemctl status systemd-sysctl --no-pager
 
 # Set device name based on cloud provider
 if [ "$CLOUD_PROVIDER" = "aws" ]; then

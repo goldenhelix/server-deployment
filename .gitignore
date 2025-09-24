@@ -38,3 +38,7 @@ terraform.rc
 
 # Ignore lock file
 .terraform.lock.hcl
+
+# Ignore local ssh key and server_variables
+ssh_key.pem
+server_variables

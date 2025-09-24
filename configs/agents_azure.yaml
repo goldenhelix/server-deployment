@@ -67,7 +67,7 @@ azure_large:
     cpu_cores: 16
     ram_gb: 32
   max_instances: 10
-  shutdown_after_idle_minutes: 60
+  shutdown_after_idle_minutes: 30
   scratch_storage: /mnt
   max_idle_instances: 1
   auto_select: true
