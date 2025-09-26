@@ -52,8 +52,8 @@ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 DEBIAN_FRONTEND=noninteractive apt-get install -y unattended-upgrades curl xfsprogs
 
 # Download and run the installer for Golden Helix Server
-# curl -o install.sh https://www.goldenhelix.com/Downloads/install.sh
-curl -o install.sh https://www.goldenhelix.com/Downloads/install-insiders.sh
+curl -o install.sh https://www.goldenhelix.com/Downloads/install.sh
+# curl -o install.sh https://www.goldenhelix.com/Downloads/install-insiders.sh
 chmod +x install.sh
 
 # Set the hostname to the Private IP in /etc/hosts
@@ -70,45 +70,52 @@ hostnamectl set-hostname "${domain_name}"
 # Install rootless podman under ghuser
 ./install.sh -y install_podman
 
-# NAT SETUP
-# The server acts as a NAT gateway to allow dynamic agents to have outbound internet access
+if [ "$CLOUD_PROVIDER" = "aws" ]; then
+    # NAT SETUP
+    # The server acts as a NAT gateway to allow dynamic agents to have outbound internet access
+    WAN_IF="$(ip route show default 0.0.0.0/0 | awk '{print $5; exit}')"
+    echo "Using WAN interface for NAT: $WAN_IF"
 
-# Add NAT configuration AFTER Docker install (to avoid Docker rules overwriting)
-IFACE=$(ip route | grep default | awk '{print $5}')
-echo "Using interface: $IFACE for NAT configuration..."
+    # Create nftables ruleset for NAT
+    cat > /etc/nftables.conf <<'CONF'
+#!/usr/sbin/nft -f
+include "/etc/nftables.d/*.nft"
+CONF
+    install -d -m 0755 /etc/nftables.d
 
-# Create nftables ruleset for NAT
-cat > /etc/nftables.conf << EOF
+    # Add NAT configuration AFTER Docker install (to avoid Docker rules overwriting)
+    # Only manage our tables; match by subnet, not interface
+    cat > /etc/nftables.d/gh-nat.nft <<EOF
 #!/usr/sbin/nft -f
 
-# Flush existing rules
-flush ruleset
+table inet gh-filter {
+  chain forward_pre {
+    type filter hook forward priority -200; policy accept;
 
-# Define tables
-table inet filter {
-    chain forward {
-        type filter hook forward priority 0; policy accept;
-        iifname "$IFACE" ip saddr ${private_subnet_cidr} accept
-        oifname "$IFACE" ip daddr ${private_subnet_cidr} accept
-    }
+    # 1) Always allow return traffic
+    ct state established,related accept
+
+    # 2) Allow NEW flows originating from your private subnet
+    ip saddr ${private_subnet_cidr} accept
+  }
 }
 
-table inet nat {
-    chain postrouting {
-        type nat hook postrouting priority 100; policy accept;
-        oifname "$IFACE" ip saddr ${private_subnet_cidr} masquerade
-    }
+table inet gh-nat {
+  chain postrouting {
+    type nat hook postrouting priority 0; policy accept;
+    oifname "$WAN_IF" ip saddr ${private_subnet_cidr} masquerade
+  }
 }
 EOF
 
-# Apply the nftables rules
-nft -f /etc/nftables.conf
+    # Apply our rules (no global flush)
+    nft -f /etc/nftables.d/gh-nat.nft
 
-# Enable nftables service for persistence
-systemctl enable nftables
-systemctl start nftables
+    # Persist across reboots
+    systemctl enable nftables
+    systemctl restart nftables
 
-cat >/etc/sysctl.d/99-nat-router.conf <<'EOF'
+    cat >/etc/sysctl.d/99-nat-router.conf <<'EOF'
 # Enable IPv4 forwarding for NAT gateway
 net.ipv4.ip_forward = 1
 
@@ -116,9 +123,11 @@ net.ipv4.conf.all.rp_filter = 2
 net.ipv4.conf.default.rp_filter = 2
 EOF
 
-# Apply now and ensure the loader is healthy
-sysctl --system
-systemctl status systemd-sysctl --no-pager
+    # Apply now and ensure the loader is healthy
+    sysctl --system
+    systemctl status systemd-sysctl --no-pager
+fi
+
 
 # Set device name based on cloud provider
 if [ "$CLOUD_PROVIDER" = "aws" ]; then
