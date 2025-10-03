@@ -227,7 +227,7 @@ EOF
 chmod +x /etc/update-motd.d/99-custom
 
 echo "Sleeping for 10 seconds to allow the server to start"
-sleep 10 # Wait for the server to start
+sleep 15 # Wait for the server to start
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
