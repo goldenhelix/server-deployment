@@ -164,16 +164,15 @@ mountpoint -q /opt || mount /opt
 systemctl enable --now fstrim.timer
 
 # Log into the Golden Helix Docker registry
-sudo -u ghuser -g ghuser -i /bin/bash -c 'docker login --username "${registry_user}" --password "${registry_pass}" registry.goldenhelix.com'
+export registry_username="${registry_user}"
+export registry_password="${registry_pass}"
+
+./install.sh -y login_registry
 
 # Variables used by create_install
 export domain_name="${domain_name}"
 export email="${primary_email}"
 export server_ip="$PRIVATE_IP"
-
-# Use auto for public DNS servers to get LetsEncrypt certificates
-# export cert_file=auto
-# export cert_key=auto
 
 # Generate self-signed certificates by default (post-install scripts set up *.varseq.com certs)
 export cert_type="self-signed"
