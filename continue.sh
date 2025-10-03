@@ -51,8 +51,6 @@ echo "Transferring server settings..."
 #Ensure our helper scripts are executable
 chmod +x ./*.sh
 
-email=$(cd "$TF_DIR" && $TF output -raw email)
-
 # Transform output state to the server as /opt/ghserver/configs/providers/aws/server_variables.tfvars
 ./transfer_server_variables.sh
 
@@ -88,16 +86,27 @@ fi
 
 # Set up dynamic agent configuration (based on configs/agents_aws.yaml or configs/agents_azure.yaml)
 ./transfer_agents_config.sh
-
 email=$(cd "$TF_DIR" && $TF output -raw email)
+
+echo "=== Server Information ===" >> "$STATUS_FILE"
+echo "Public IP: $public_ip" >> "$STATUS_FILE"
+echo "URL: https://$domain_name" >> "$STATUS_FILE"
+echo "Email: $email" >> "$STATUS_FILE"
+
 if [ "$SETUP_SAML" = true ]; then
     # Transfer SAML settings
     ./transfer_saml_settings.sh "${email}"
+    
+    echo "Note: Use your organization's SAML login" >> "$STATUS_FILE"
+    echo "" >> "$STATUS_FILE"
 else
-  echo "Setting up admin user..."
+    echo "Setting up admin user..."
     # Generate a printable password and add the admin user
     password=$(openssl rand -base64 18)
     ./add_admin.sh "${email}" "${password}"
+    
+    echo "Password: $password" >> "$STATUS_FILE"
+    echo "" >> "$STATUS_FILE"
 fi
 
 # docker images
@@ -133,18 +142,22 @@ if [ "$CLOUD_PROVIDER" = "aws" ]; then
     s3_bucket=$(cd "$TF_DIR" && $TF output -raw bucket_name)
     ./add_server_s3.sh CloudStorage "${s3_bucket}"
     ./add_workspace_share.sh "${WORKSPACE}" CloudStorage
+    ./add_workspace_resource_path.sh "${WORKSPACE}" "CloudStorage/resources"
     # Add storage to second workspace if it exists
     if [ -n "${WORKSPACE2:-}" ]; then
         ./add_workspace_share.sh "${WORKSPACE2}" CloudStorage
+        ./add_workspace_resource_path.sh "${WORKSPACE2}" "CloudStorage/resources"
     fi
 elif [ "$CLOUD_PROVIDER" = "azure" ]; then
     storage_account_name=$(cd "$TF_DIR" && $TF output -raw storage_account_name)
     storage_container_name=$(cd "$TF_DIR" && $TF output -raw storage_container_name)
     ./add_server_azure.sh "CloudStorage" "${storage_account_name}" "${storage_container_name}"
     ./add_workspace_share.sh "${WORKSPACE}" CloudStorage
+    ./add_workspace_resource_path.sh "${WORKSPACE}" "CloudStorage/resources"
     # Add storage to second workspace if it exists
     if [ -n "${WORKSPACE2:-}" ]; then
         ./add_workspace_share.sh "${WORKSPACE2}" CloudStorage
+        ./add_workspace_resource_path.sh "${WORKSPACE2}" "CloudStorage/resources"
     fi
 fi
 
@@ -190,11 +203,20 @@ ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_ke
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
-echo "Server ${domain_name} created in $DURATION seconds at IP: ${public_ip}"
-if [ "$SETUP_SAML" = true ]; then
-    echo "You can log in with the following email: $email"
-else 
-    echo "You can log in with the following admin credentials:"
-    echo "  Email: $email"
-    echo "  Password: $password"
+
+# Add completion information to status file
+echo "=== Workspaces Created ===" >> "$STATUS_FILE"
+echo "Primary workspace: ${WORKSPACE_NAME} (${WORKSPACE_ASSEMBLY})" >> "$STATUS_FILE"
+if [ -n "${WORKSPACE2:-}" ]; then
+    echo "Secondary workspace: ${WORKSPACE2_NAME} (${WORKSPACE2_ASSEMBLY})" >> "$STATUS_FILE"
 fi
+echo "Deployment completed: $(date) in $DURATION seconds" >> "$STATUS_FILE"
+echo "" >> "$STATUS_FILE"
+
+
+echo ""
+echo "=== IMPORTANT INFORMATION SAVED TO status.txt ==="
+echo "cat status.txt"
+echo ""
+cat "$STATUS_FILE"
+echo ""

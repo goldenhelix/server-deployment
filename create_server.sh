@@ -17,6 +17,14 @@ error_handler() {
 }
 START_TIME=$(date +%s)
 
+# Initialize status file
+STATUS_FILE="status.txt"
+echo "=== Server Deployment Status ===" > "$STATUS_FILE"
+echo "Deployment started: $(date)" >> "$STATUS_FILE"
+echo "Server name: ${SERVER_NAME}" >> "$STATUS_FILE"
+echo "Cloud provider: ${CLOUD_PROVIDER:-aws}" >> "$STATUS_FILE"
+echo "" >> "$STATUS_FILE"
+
 trap 'error_handler ${LINENO}' ERR
 
 # Determine Terraform directory based on provider
@@ -42,6 +50,12 @@ public_ip=$($TF output -raw public_ip)
 domain_name=$($TF output -raw domain_name)
 
 echo "Server instance created with public IP: $public_ip"
+
+# Capture server information in status file
+echo "=== Server Information ===" >> "$STATUS_FILE"
+echo "Public IP: $public_ip" >> "$STATUS_FILE"
+echo "URL: https://$domain_name" >> "$STATUS_FILE"
+echo "" >> "$STATUS_FILE"
 
 # Get ssh key if generated (otherwise we expect it to be at ./ssh_key.pem)
 generated_key=$($TF output -raw generated_ssh_private_key)
@@ -169,16 +183,27 @@ fi
 
 # Set up dynamic agent configuration (based on configs/agents_aws.yaml or configs/agents_azure.yaml)
 ./transfer_agents_config.sh
-
 email=$(cd "$TF_DIR" && $TF output -raw email)
+
+echo "=== Server Information ===" >> "$STATUS_FILE"
+echo "Public IP: $public_ip" >> "$STATUS_FILE"
+echo "URL: https://$domain_name" >> "$STATUS_FILE"
+echo "Email: $email" >> "$STATUS_FILE"
+
 if [ "$SETUP_SAML" = true ]; then
     # Transfer SAML settings
     ./transfer_saml_settings.sh "${email}"
+    
+    echo "Note: Use your organization's SAML login" >> "$STATUS_FILE"
+    echo "" >> "$STATUS_FILE"
 else
     echo "Setting up admin user..."
     # Generate a printable password and add the admin user
     password=$(openssl rand -base64 18)
     ./add_admin.sh "${email}" "${password}"
+    
+    echo "Password: $password" >> "$STATUS_FILE"
+    echo "" >> "$STATUS_FILE"
 fi
 
 # docker images
@@ -275,11 +300,20 @@ ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_ke
 
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
-echo "Server ${domain_name} created in $DURATION seconds at IP: ${public_ip}"
-if [ "$SETUP_SAML" = true ]; then
-    echo "You can log in with the following email: $email"
-else 
-    echo "You can log in with the following admin credentials:"
-    echo "  Email: $email"
-    echo "  Password: $password"
+
+# Add completion information to status file
+echo "=== Workspaces Created ===" >> "$STATUS_FILE"
+echo "Primary workspace: ${WORKSPACE_NAME} (${WORKSPACE_ASSEMBLY})" >> "$STATUS_FILE"
+if [ -n "${WORKSPACE2:-}" ]; then
+    echo "Secondary workspace: ${WORKSPACE2_NAME} (${WORKSPACE2_ASSEMBLY})" >> "$STATUS_FILE"
 fi
+echo "Deployment completed: $(date) in $DURATION seconds" >> "$STATUS_FILE"
+echo "" >> "$STATUS_FILE"
+
+
+echo ""
+echo "=== IMPORTANT INFORMATION SAVED TO status.txt ==="
+echo "cat status.txt"
+echo ""
+cat "$STATUS_FILE"
+echo ""
