@@ -42,5 +42,6 @@ terraform.rc
 # Ignore local ssh key and server_variables
 ssh_key.pem
 server_variables
+status.txt
 
 configs/*.lic

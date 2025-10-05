@@ -54,8 +54,16 @@ chmod +x ./*.sh
 # Transform output state to the server as /opt/ghserver/configs/providers/aws/server_variables.tfvars
 ./transfer_server_variables.sh
 
+# docker images (we do this first while the server finishes starting up)
+./setup_agent_images.sh
+
 # Set time zone on the server
 ./set_timezone.sh "${TIMEZONE}"
+
+# Set support email on the server if defined
+if [ -n "${SUPPORT_EMAIL:-}" ]; then
+    ./set_support_email.sh "${SUPPORT_EMAIL}"
+fi
 
 # Set default locale on the server
 ./set_locale.sh "${LOCALE}"
@@ -108,9 +116,6 @@ else
     echo "Password: $password" >> "$STATUS_FILE"
     echo "" >> "$STATUS_FILE"
 fi
-
-# docker images
-./setup_agent_images.sh
 
 # Transfer SMTP server settings
 ./transfer_smtp_settings.sh
