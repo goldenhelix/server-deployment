@@ -96,10 +96,14 @@ fi
 ./transfer_agents_config.sh
 email=$(cd "$TF_DIR" && $TF output -raw email)
 
+STATUS_FILE="status.txt"
+echo "Deployment continued: $(date)" >> "$STATUS_FILE"
+echo "" >> "$STATUS_FILE"
 echo "=== Server Information ===" >> "$STATUS_FILE"
 echo "Public IP: $public_ip" >> "$STATUS_FILE"
 echo "URL: https://$domain_name" >> "$STATUS_FILE"
 echo "Email: $email" >> "$STATUS_FILE"
+
 
 if [ "$SETUP_SAML" = true ]; then
     # Transfer SAML settings

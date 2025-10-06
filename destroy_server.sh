@@ -11,6 +11,7 @@ TF_DIR="tf_${CLOUD_PROVIDER:-aws}"
 
 echo "Starting server instance..."
 cd "$TF_DIR"
+$TF init -upgrade=false
 
 # Check if secrets.tfvars file exists
 if [ -f secrets.tfvars ]; then
