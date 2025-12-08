@@ -79,6 +79,12 @@ variable "ssh_access_cidrs" {
   type        = list(string)
 }
 
+variable "storage_allowed_ip_addresses" {
+  description = "List of IP addresses or CIDR blocks allowed to access the storage account (for Azure Portal browsing, etc.). Example: [\"63.153.23.144/32\"]"
+  type        = list(string)
+  default     = []
+}
+
 variable "ssh_authorized_keys" {
   description = "SSH public keys to add to authorized_keys file"
   type        = string

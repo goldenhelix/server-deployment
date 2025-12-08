@@ -23,8 +23,7 @@ TF_DIR="tf_${CLOUD_PROVIDER:-aws}"
 # Get the public IP of the server
 public_ip=$(cd "$TF_DIR" && $TF output -raw public_ip)
 
-# Add the Azure blob storage to the server, when no credentials are provided, the
-# server will also set the account name and container name in mounts.yaml as an
-# agent cloud bucket to be mounted.
+# Add the Azure NFS storage to the server
 ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_key.pem \
- "$ADMIN_USER"@"$public_ip" "sudo /opt/ghserver/install.sh -y add_mount_azure \"${mount_name}\" \"${account_name}\" \"${container_name}\""
+    "$ADMIN_USER"@"$public_ip" "sudo /opt/ghserver/install.sh -y add_mount_azurenfs \"${mount_name}\" \"${account_name}\" \"${container_name}\""
+

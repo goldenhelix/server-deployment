@@ -14,6 +14,9 @@ resource "azurerm_subnet" "public" {
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = [cidrsubnet(var.vnet_subnet_cidr, local.gh_server_subnet_cidr_size, 0)]
+  
+  # Service endpoint required for NFS 3.0 access to storage account
+  service_endpoints = ["Microsoft.Storage"]
 }
 
 # Create a route table for the public subnet

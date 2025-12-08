@@ -91,6 +91,11 @@ output "storage_account_name" {
 
 output "storage_container_name" {
   value = module.standard.storage_container_name
+}
+
+output "storage_nfs_endpoint" {
+  description = "NFS3 mount endpoint for the blob storage container"
+  value       = module.standard.storage_nfs_endpoint
 } 
 
 # Get current client config

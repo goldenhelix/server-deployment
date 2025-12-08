@@ -18,6 +18,7 @@ module "standard" {
   # Access control
   web_access_cidrs = var.web_access_cidrs
   ssh_access_cidrs = var.ssh_access_cidrs
+  storage_allowed_ip_addresses = var.storage_allowed_ip_addresses
 
   # Authentication and credentials
   primary_email  = var.primary_email

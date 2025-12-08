@@ -129,4 +129,15 @@ variable "azure_tags" {
   description = "Tags to apply to all resources"
   type        = map(string)
   default     = {}
+}
+
+variable "storage_allowed_ip_addresses" {
+  description = "List of IP addresses or CIDR blocks allowed to access the storage account (for Azure Portal browsing, etc.). WARNING: These are example values. Restrict access appropriately in production"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+  
+  validation {
+    condition     = alltrue([for ip in var.storage_allowed_ip_addresses : can(cidrhost(ip, 0))])
+    error_message = "One of the IP addresses or CIDR blocks provided in the storage_allowed_ip_addresses variable is invalid."
+  }
 } 

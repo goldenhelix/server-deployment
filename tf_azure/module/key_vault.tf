@@ -4,9 +4,14 @@ resource "tls_private_key" "ssh_key" {
   algorithm = "ED25519"
 }
 
+# Generate a random suffix for Key Vault name to ensure global uniqueness
+resource "random_id" "kv_suffix" {
+  byte_length = 2  # Generates 4 hex characters (e.g., "a1b2")
+}
+
 # Store the private key in Azure Key Vault for secure access
 resource "azurerm_key_vault" "this" {
-  name                = "${var.project_name}${var.server_zone_name}kv"
+  name                = "${var.project_name}${var.server_zone_name}kv${substr(random_id.kv_suffix.hex, 0, 4)}"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   tenant_id          = data.azurerm_client_config.current.tenant_id

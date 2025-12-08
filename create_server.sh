@@ -154,6 +154,9 @@ chmod +x ./*.sh
 # docker images (we do this first while the server finishes starting up)
 ./setup_agent_images.sh
 
+# Wait for the server to finish starting up
+./wait_for_server.sh "${domain_name}"
+
 # Set time zone on the server
 ./set_timezone.sh "${TIMEZONE}"
 
@@ -253,7 +256,7 @@ if [ "$CLOUD_PROVIDER" = "aws" ]; then
 elif [ "$CLOUD_PROVIDER" = "azure" ]; then
     storage_account_name=$(cd "$TF_DIR" && $TF output -raw storage_account_name)
     storage_container_name=$(cd "$TF_DIR" && $TF output -raw storage_container_name)
-    ./add_server_azure.sh "CloudStorage" "${storage_account_name}" "${storage_container_name}"
+    ./add_azure_nfs.sh "CloudStorage" "${storage_account_name}" "${storage_container_name}"
     ./add_workspace_share.sh "${WORKSPACE}" CloudStorage
     ./add_workspace_resource_path.sh "${WORKSPACE}" "CloudStorage/resources"
     # Add storage to second workspace if it exists
@@ -290,7 +293,7 @@ fi
 
 # Set up Azure Blob Storage mount
 if [ -n "${AZURE_MOUNT_NAME}" ] && [ -n "${AZURE_ACCOUNT_NAME}" ] && [ -n "${AZURE_ACCOUNT_KEY}" ] && [ -n "${AZURE_ACCOUNT_CONTAINER}" ]; then
-    ./add_azure_blob.sh "${AZURE_MOUNT_NAME}" "${AZURE_ACCOUNT_NAME}" "${AZURE_ACCOUNT_KEY}" "${AZURE_ACCOUNT_CONTAINER}"
+    ./add_azure_blob.sh "${AZURE_MOUNT_NAME}" "${AZURE_ACCOUNT_NAME}" "${AZURE_ACCOUNT_CONTAINER}" "${AZURE_ACCOUNT_KEY}"
     ./add_workspace_share.sh "${WORKSPACE}" "${AZURE_MOUNT_NAME}"
     # Add mount to second workspace if it exists
     if [ -n "${WORKSPACE2:-}" ]; then
