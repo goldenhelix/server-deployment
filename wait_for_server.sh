@@ -39,7 +39,7 @@ while true; do
     HTTP_CODE=$(ssh -q -o ConnectTimeout=5 -o "StrictHostKeyChecking=no" \
         -o "UserKnownHostsFile=/dev/null" -i ssh_key.pem \
         "$ADMIN_USER"@"$public_ip" \
-        "curl -s -o /dev/null -w '%{http_code}' --max-time 5 'https://${domain_name}/auth/api/authenticationMethod' 2>/dev/null" 2>/dev/null || echo "000")
+        "curl -s -o /dev/null -w '%{http_code}' --max-time 5 --insecure 'https://${domain_name}/auth/api/authenticationMethod' 2>/dev/null" 2>/dev/null || echo "000")
     set -e
     
     if [ "$HTTP_CODE" = "200" ]; then

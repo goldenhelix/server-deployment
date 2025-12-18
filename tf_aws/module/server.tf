@@ -55,8 +55,10 @@ resource "aws_ebs_volume" "workflow_data" {
   availability_zone = aws_instance.server.availability_zone
   size             = var.workflow_hdd_size_gb
   type             = "gp3"
-  iops             = 16000
-  throughput       = 1000
+  # Baseline gp3 is 3,000 IOPS / 125 MB/s. We provision a modest uplift 
+  # that is a good tradeoff between cost and performance.
+  iops             = 10000
+  throughput       = 600
 
   tags = {
     Name        = "${var.project_name}-${var.server_zone_name}-workflow-volume"

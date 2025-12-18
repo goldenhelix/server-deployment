@@ -50,3 +50,26 @@ resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private.id
   route_table_id = aws_route_table.private.id
 }
+
+##
+## VPC Endpoint: S3 (Gateway)
+##
+## Allows private subnet instances to reach S3 without traversing NAT/IGW.
+## This endpoint is associated with the private route table used by the private subnet
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.this.id
+  vpc_endpoint_type = "Gateway"
+  service_name      = "com.amazonaws.${var.aws_region}.s3"
+
+  # Gateway endpoints are attached to route tables (not subnets)
+  # Attach to both private + public route tables so instances in either subnet
+  # (including the server in the public subnet) use the S3 endpoint routes.
+  route_table_ids = [
+    aws_route_table.private.id,
+    aws_route_table.public.id
+  ]
+
+  tags = {
+    Name = "${var.project_name}-${var.server_zone_name}-s3-gateway-endpoint"
+  }
+}
