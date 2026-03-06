@@ -36,4 +36,4 @@ ssh -q -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -i ssh_ke
     sudo mv /tmp/idp_cert.pem /opt/ghserver/configs/keys/idp_cert.pem && \
     sudo chown ghuser:ghuser /opt/ghserver/configs/keys/idp_cert.pem && \
     sudo sed -i '/^auth_method:/ s/local/saml/' /opt/ghserver/config.yaml && \
-    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && ./restart.sh && ./ghadmin user-add \"${email}\" --admin'"
+    sudo -u ghuser -g ghuser -i /bin/bash -c 'cd /opt/ghserver && ./restart.sh && sleep 5 && ./ghadmin user-add \"${email}\" --admin'"
