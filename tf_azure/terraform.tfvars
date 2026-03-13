@@ -40,6 +40,10 @@ workflow_data_disk_size_gb = 600
 # Swap size in GB
 swap_size  = 16
 
+## Backup settings
+# Set to false to disable disk snapshot backups (speeds up test/dev deployments)
+# enable_backup = false
+
 ## Default tags for all Azure resources
 azure_tags = {
   Service_name    = "Golden Helix Server"

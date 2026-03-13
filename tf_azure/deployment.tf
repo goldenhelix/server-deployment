@@ -25,6 +25,9 @@ module "standard" {
   registry_user  = var.registry_user
   registry_pass  = var.registry_pass
 
+  # Backup
+  enable_backup  = var.enable_backup
+
   # Resource tagging
   azure_tags     = var.azure_tags
 }

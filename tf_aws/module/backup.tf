@@ -1,7 +1,8 @@
 # Automatic EBS snapshots
 resource "aws_dlm_lifecycle_policy" "ebs_backup" {
+  count              = var.enable_backup ? 1 : 0
   description        = "EBS backup policy"
-  execution_role_arn = aws_iam_role.dlm_lifecycle_role.arn
+  execution_role_arn = aws_iam_role.dlm_lifecycle_role[0].arn
   state             = "ENABLED"
 
   policy_details {
@@ -31,7 +32,8 @@ resource "aws_dlm_lifecycle_policy" "ebs_backup" {
 }
 
 resource "aws_iam_role" "dlm_lifecycle_role" {
-  name = "${var.project_name}-${var.server_zone_name}-dlm-lifecycle-role"
+  count = var.enable_backup ? 1 : 0
+  name  = "${var.project_name}-${var.server_zone_name}-dlm-lifecycle-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -48,6 +50,7 @@ resource "aws_iam_role" "dlm_lifecycle_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "dlm_lifecycle_policy_attachment" {
-  role       = aws_iam_role.dlm_lifecycle_role.name
+  count      = var.enable_backup ? 1 : 0
+  role       = aws_iam_role.dlm_lifecycle_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSDataLifecycleManagerServiceRole"
 }

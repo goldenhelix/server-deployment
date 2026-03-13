@@ -30,7 +30,7 @@ resource "azurerm_key_vault" "this" {
 # Allow time for Key Vault access policy to propagate in Entra ID
 resource "time_sleep" "wait_for_kv_policy" {
   depends_on      = [azurerm_key_vault.this]
-  create_duration = "60s"
+  create_duration = "120s"
 }
 
 # Store the SSH private key as a secret

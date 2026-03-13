@@ -16,10 +16,10 @@ resource "aws_instance" "server" {
 
   root_block_device {
     volume_size = var.master_hdd_size_gb
-    tags = {
-      Name        = "${var.project_name}-${var.server_zone_name}-root-volume"
-      DailyBackup = "true"
-    }
+    tags = merge(
+      { Name = "${var.project_name}-${var.server_zone_name}-root-volume" },
+      var.enable_backup ? { DailyBackup = "true" } : {}
+    )
   }
 
   user_data = templatefile("${path.module}/../../userdata/server_bootstrap.sh",
@@ -43,11 +43,10 @@ resource "aws_instance" "server" {
     instance_metadata_tags      = null
   }
 
-  tags = {
-    Name = "${var.project_name}-${var.server_zone_name}-ghserver"
-    # Enable nightly backups of EBS volumes
-    NightlyBackup = "true"
-  }
+  tags = merge(
+    { Name = "${var.project_name}-${var.server_zone_name}-ghserver" },
+    var.enable_backup ? { NightlyBackup = "true" } : {}
+  )
 }
 
 # Secondary EBS volume for workflow data
@@ -60,10 +59,10 @@ resource "aws_ebs_volume" "workflow_data" {
   iops             = 10000
   throughput       = 600
 
-  tags = {
-    Name        = "${var.project_name}-${var.server_zone_name}-workflow-volume"
-    DailyBackup = "true"
-  }
+  tags = merge(
+    { Name = "${var.project_name}-${var.server_zone_name}-workflow-volume" },
+    var.enable_backup ? { DailyBackup = "true" } : {}
+  )
 }
 
 resource "aws_volume_attachment" "workflow_data_att" {

@@ -125,6 +125,12 @@ variable "swap_size" {
   default     = 4
 }
 
+variable "enable_backup" {
+  description = "Enable Data Protection Backup Vault for disk snapshots. Disable for test/dev deployments to save time and cost."
+  type        = bool
+  default     = true
+}
+
 variable "azure_tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

@@ -160,6 +160,12 @@ variable "ssh_authorized_keys" {
   type        = string
 }
 
+variable "enable_backup" {
+  description = "Enable DLM EBS snapshot backups. Disable for test/dev deployments to save time and cost."
+  type        = bool
+  default     = true
+}
+
 variable "aws_default_tags" {
   description = "Default tags to apply to all AWS resources for this deployment"
   type        = map(any)

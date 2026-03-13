@@ -108,6 +108,13 @@ variable "registry_pass" {
   sensitive   = true
 }
 
+# Backup
+variable "enable_backup" {
+  description = "Enable Data Protection Backup Vault for disk snapshots. Disable for test/dev deployments to save time and cost."
+  type        = bool
+  default     = true
+}
+
 # Resource tagging
 variable "azure_tags" {
   description = "Tags to apply to all resources"

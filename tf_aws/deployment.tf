@@ -18,6 +18,7 @@ module "standard" {
   web_access_cidrs           = var.web_access_cidrs
   ssh_access_cidrs           = var.ssh_access_cidrs
   server_zone_name           = var.server_zone_name
+  enable_backup              = var.enable_backup
 
   primary_email              = var.primary_email
   registry_user              = var.registry_user

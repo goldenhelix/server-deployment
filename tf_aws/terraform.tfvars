@@ -38,6 +38,10 @@ workflow_hdd_size_gb = 600
 # Swap size in GB
 swap_size  = 16
 
+## Backup settings
+# Set to false to disable EBS snapshot backups (speeds up test/dev deployments)
+# enable_backup = false
+
 ## Default tags for all AWS resources, also in dynamic agents
 aws_default_tags = {
   Service_name    = "Golden Helix Server"
