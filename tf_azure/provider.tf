@@ -13,6 +13,10 @@ terraform {
       source  = "hashicorp/tls"
       version = "~> 4.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
   
   required_version = ">= 1.0"
@@ -37,5 +41,6 @@ provider "azurerm" {
 }
 
 provider "random" {}
-provider "tls" {} 
+provider "tls" {}
+provider "time" {}
 
