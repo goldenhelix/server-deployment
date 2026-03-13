@@ -121,10 +121,11 @@ while true; do
             fi
         else
             echo "Error: cloud-init failed with exit code $exit_code."
-            echo "Last 50 lines of /var/log/cloud-init-output.log..."
+            echo "Last 100 lines of /var/log/cloud-init-output.log..."
+            echo "----------------------------------------"
             ssh -q -o ConnectTimeout=5 -o "StrictHostKeyChecking=no" \
                 -o "UserKnownHostsFile=/dev/null" -i ssh_key.pem \
-                "$ADMIN_USER"@"$public_ip" 'tail -n 50 /var/log/cloud-init-output.log'
+                "$ADMIN_USER"@"$public_ip" 'tail -n 100 /var/log/cloud-init-output.log'
             echo ""
             echo "Destroy the server by running the following command:"
             echo "  tofu destroy -auto-approve -var-file=secrets.tfvars"
