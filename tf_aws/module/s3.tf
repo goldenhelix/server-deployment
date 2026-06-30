@@ -25,7 +25,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "server_bucket_lifecycle" {
 
 
 resource "aws_iam_policy" "s3_access_policy" {
-  name = "${var.project_name}-s3-access-policy"
+  name = "${var.project_name}-${var.server_zone_name}-s3-access-policy"
 
   policy = jsonencode({
     Version = "2012-10-17",
