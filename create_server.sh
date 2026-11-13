@@ -42,8 +42,15 @@ else
   TF_VAR_FILE_ARG=""
 fi
 
+# ENABLE_BACKUP in env.sh overrides enable_backup in terraform.tfvars
+TF_BACKUP_ARG=""
+if [ -n "${ENABLE_BACKUP:-}" ]; then
+  TF_BACKUP_ARG="-var=enable_backup=${ENABLE_BACKUP}"
+  echo "Disk snapshot backups: enable_backup=${ENABLE_BACKUP}"
+fi
+
 # Now create the new infrastructure
-$TF apply -auto-approve -replace="aws_instance.server" $TF_VAR_FILE_ARG
+$TF apply -auto-approve -replace="aws_instance.server" $TF_VAR_FILE_ARG $TF_BACKUP_ARG
 
 # Get the agent private IP
 public_ip=$($TF output -raw public_ip)
