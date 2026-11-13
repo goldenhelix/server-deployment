@@ -23,7 +23,7 @@ azure_nano:
 azure_small:
   provider: azure
   enabled: true
-  description: Azure VM with 8GB 4C (Standard_F4s_v2) - 32G scratch storage
+  description: Azure VM with 8GB 4C (Standard_D4alds_v7) - 220G NVMe scratch storage
   capabilities:
     - workflows
     - applications
@@ -35,13 +35,13 @@ azure_small:
   max_idle_instances: 2
   scratch_storage: /mnt
   auto_select: true
-  cost_per_hour: 0.1690
-  instance_type: Standard_F4s_v2
+  cost_per_hour: 0.1900
+  instance_type: Standard_D4alds_v7
 
 azure_medium:
   provider: azure
   enabled: true
-  description: Azure VM with 16GB 8C (Standard_F8s_v2) - 64G scratch storage
+  description: Azure VM with 16GB 8C (Standard_D8alds_v7) - 440G NVMe scratch storage
   capabilities:
     - workflows
     - applications
@@ -53,13 +53,13 @@ azure_medium:
   max_idle_instances: 2
   scratch_storage: /mnt
   auto_select: true
-  cost_per_hour: 0.3380
-  instance_type: Standard_F8s_v2
+  cost_per_hour: 0.3810
+  instance_type: Standard_D8alds_v7
 
 azure_large:
   provider: azure
   enabled: true
-  description: Azure VM with 32GB 16C (Standard_F16s_v2) - 128G scratch storage
+  description: Azure VM with 32GB 16C (Standard_D16alds_v7) - 880G NVMe scratch storage
   capabilities:
     - workflows
     - applications
@@ -72,13 +72,13 @@ azure_large:
   max_idle_instances: 1
   auto_select: true
   min_capacity_share: 0.8
-  cost_per_hour: 0.6770
-  instance_type: Standard_F16s_v2
+  cost_per_hour: 0.7620
+  instance_type: Standard_D16alds_v7
 
 azure_xlarge:
   provider: azure
   enabled: true
-  description: Azure VM with 64GB 32C (Standard_F32s_v2) - 256G scratch storage
+  description: Azure VM with 64GB 32C (Standard_D32alds_v7) - 1760G NVMe scratch storage
   capabilities:
     - workflows
     - applications
@@ -90,13 +90,13 @@ azure_xlarge:
   shutdown_after_idle_minutes: 5
   auto_select: true
   min_capacity_share: 0.8
-  cost_per_hour: 1.353
-  instance_type: Standard_F32s_v2
+  cost_per_hour: 1.523
+  instance_type: Standard_D32alds_v7
 
 azure_2xlarge:
   provider: azure
   enabled: true
-  description: Azure VM with 96GB 48C (Standard_F48s_v2) - 384G scratch storage
+  description: Azure VM with 96GB 48C (Standard_D48alds_v7) - 2640G NVMe scratch storage
   capabilities:
     - workflows # This high-CPU instance is optimized for secondary analysis workflows
   resources:
@@ -107,13 +107,13 @@ azure_2xlarge:
   shutdown_after_idle_minutes: 5
   auto_select: true
   min_capacity_share: 0.8
-  cost_per_hour: 2.030
-  instance_type: Standard_F48s_v2
+  cost_per_hour: 2.285
+  instance_type: Standard_D48alds_v7
 
 azure_4xlarge:
   provider: azure
   enabled: true
-  description: Azure VM with 128GB 64C (Standard_F64s_v2) - 512G scratch storage
+  description: Azure VM with 128GB 64C (Standard_D64alds_v7) - 3520G NVMe scratch storage
   capabilities:
     - workflows # This high-CPU instance is optimized for secondary analysis workflows
   resources:
@@ -124,5 +124,5 @@ azure_4xlarge:
   shutdown_after_idle_minutes: 5
   auto_select: true
   min_capacity_share: 0.8
-  cost_per_hour: 2.706
-  instance_type: Standard_F64s_v2
+  cost_per_hour: 3.046
+  instance_type: Standard_D64alds_v7
