@@ -65,6 +65,30 @@ invites as well as security events. SMTP is required for these emails to be sent
 You can configure the SMTP server by editing `configs/smtp.yaml` before running
 the `./create_server.sh` script.
 
+### SendGrid (email over HTTPS)
+
+If outbound SMTP is blocked by network policy, the server can send email
+through the SendGrid API over HTTPS instead. Edit `configs/sendgrid.yaml` with
+your API key and a verified sender, then run:
+
+```bash
+./transfer_sendgrid_settings.sh
+```
+
+This copies the file to `/opt/ghserver/configs/sendgrid.yaml`, sets
+`smtp_enabled: false` and `sendgrid_enabled: true` in `config.yaml`, and
+reloads the server.
+
+`create_server.sh` (and `continue.sh`) pick automatically: SendGrid if
+`configs/sendgrid.yaml` exists, is not empty or whitespace-only, and its
+`api_key` is not the `SG.replace_with_your_api_key` placeholder; otherwise
+SMTP. `./transfer_sendgrid_settings.sh --check` runs the same test locally.
+
+To switch an existing server back and forth, run either script:
+`transfer_smtp_settings.sh` sets `sendgrid_enabled: false` (SendGrid takes
+precedence when both are on), and `transfer_sendgrid_settings.sh` sets
+`smtp_enabled: false`.
+
 ### SSH Key Pair
 
 You may allow the deployment to generate an SSH key pair for you, or you may

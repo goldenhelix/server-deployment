@@ -225,8 +225,12 @@ else
     echo "" >> "$STATUS_FILE"
 fi
 
-# Transfer SMTP server settings
-./transfer_smtp_settings.sh
+# Email delivery: SendGrid if configs/sendgrid.yaml is filled in, otherwise SMTP
+if ./transfer_sendgrid_settings.sh --check; then
+    ./transfer_sendgrid_settings.sh
+else
+    ./transfer_smtp_settings.sh
+fi
 
 # Activate the license, requires that email is registered with Golden Helix
 ./activate_license.sh "${LICENSE_KEY}" "${email}"

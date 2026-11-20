@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=./schemas/sendgrid.json
+# SendGrid settings for sending emails over HTTPS instead of SMTP
+# Use this when outbound SMTP is blocked by network policy
+# Enable it with `sendgrid_enabled: true` in config.yaml, where it takes
+# precedence over `smtp_enabled`
+
+api_key: SG.replace_with_your_api_key
+
+# Must be a verified sender identity in your SendGrid account
+from: Sender Name<sender@server.com>
+
+# For an EU data residency account:
+# api_url: https://api.eu.sendgrid.com/v3/mail/send
+
+# api_url can also point at your own handler that accepts the same request
+# shape, to route mail into an internal system. Comment out api_key if that
+# handler needs no credential
