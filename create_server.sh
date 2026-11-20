@@ -159,9 +159,6 @@ chmod +x ./*.sh
 # Transform output state to the server as /opt/ghserver/configs/providers/aws/server_variables.tfvars
 ./transfer_server_variables.sh
 
-# docker images (we do this first while the server finishes starting up)
-./setup_agent_images.sh
-
 # Wait for the server to finish starting up
 ./wait_for_server.sh "${domain_name}"
 
