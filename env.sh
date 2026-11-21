@@ -4,6 +4,11 @@ CLOUD_PROVIDER="aws"  # Change to "azure" for Azure deployments
 # Terraform binary location
 TF=tofu
 
+# Daily disk snapshot backups (AWS DLM / Azure Backup Vault). Set to false for
+# quick test servers: Azure backup vaults are slow and fragile to tear down.
+# Overrides enable_backup in tf_*/terraform.tfvars when set.
+# ENABLE_BACKUP=false
+
 # License key for the server
 LICENSE_KEY=S-000000-000000-000000-000000
 
