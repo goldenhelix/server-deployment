@@ -1,6 +1,9 @@
 
 resource "aws_s3_bucket" "server_bucket" {
   bucket = "${var.project_name}-${var.server_zone_name}-gh-bucket"
+  # Let destroy_server.sh delete a non-empty bucket, as deleting the Azure
+  # resource group deletes its storage account
+  force_destroy = true
 
   tags = {
     Name = "${var.project_name}-${var.server_zone_name}-gh-bucket"

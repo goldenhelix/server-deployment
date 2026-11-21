@@ -50,7 +50,7 @@ if [ -n "${ENABLE_BACKUP:-}" ]; then
 fi
 
 # Now create the new infrastructure
-$TF apply -auto-approve -replace="aws_instance.server" $TF_VAR_FILE_ARG $TF_BACKUP_ARG
+$TF apply -auto-approve $TF_VAR_FILE_ARG $TF_BACKUP_ARG
 
 # Get the agent private IP
 public_ip=$($TF output -raw public_ip)
